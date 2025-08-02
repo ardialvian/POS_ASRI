@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="container mt-4">
+    <h2>Tambah Pembelian</h2>
+    <a href="{{ url_for('main.list_purchases') }}" class="btn btn-primary mb-3">
+      <i class="bi bi-clock-history"></i> Riwayat Pembelian
+    </a>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <form method="POST" action="{{ url_for('main.add_purchase') }}">
+      <div class="mb-3">
+        <label for="product_name" class="form-label">Produk</label>
+        <input type="text" name="product_name" id="product_name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="code" class="form-label">Kode Produk</label>
+        <input type="text" name="code" id="code" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label for="category" class="form-label">Jenis/Kategori</label>
+        <input type="text" name="category" id="category" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label for="purchase_price" class="form-label">Harga Beli (Rp)</label>
+        <input type="number" name="purchase_price" id="purchase_price" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="quantity" class="form-label">Jumlah</label>
+        <input type="number" name="quantity" id="quantity" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="sell_price" class="form-label">Harga Jual (Rp)</label>
+        <input type="number" name="sell_price" id="sell_price" class="form-control">
+      </div>
+      <button type="submit" class="btn btn-primary">Simpan</button>
+      <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">Batal</a>
+    </form>
+  </div>
+{% endblock %}

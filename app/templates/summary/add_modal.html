@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Tambah Modal Awal</h2>
+  <form method="POST" action="{{ url_for('main.add_modal') }}">
+    <div class="form-group mt-3">
+      <label for="modal_awal">Modal Awal</label>
+      <input type="number" name="modal_awal" step="0.01" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-success mt-3">Simpan</button>
+    <a href="{{ url_for('main.summary') }}" class="btn btn-secondary mt-3">Batal</a>
+  </form>
+</div>
+{% endblock %}

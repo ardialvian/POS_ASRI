@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Summary Keuangan</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="d-flex justify-content-end mb-3">
+    <a href="{{ url_for('main.add_modal') }}" class="btn btn-primary">+ Tambah Modal</a>
+  </div>
+
+  {% if all_summaries %}
+    <hr>
+    <h4 class="mt-4">Daftar Summary</h4>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+          <tr>
+            <th>Tanggal</th>
+            <th>Modal Awal</th>
+            <th>Total Pembelian</th>
+            <th>Total Penjualan</th>
+            <th>Total Profit</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in all_summaries %}
+          <tr>
+            <td>{{ s[5].strftime('%Y-%m-%d') }}</td>
+            <td>Rp{{ "{:,.0f}".format(s[1]) }}</td>
+            <td>Rp{{ "{:,.0f}".format(s[2]) }}</td>
+            <td>Rp{{ "{:,.0f}".format(s[3]) }}</td>
+            <td>Rp{{ "{:,.0f}".format(s[4]) }}</td>
+            <td>
+              <a href="{{ url_for('main.edit_summary', id=s[0]) }}" class="btn btn-warning btn-sm">Edit</a>
+              <a href="{{ url_for('main.delete_summary', id=s[0]) }}" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="mt-3 text-muted">Belum ada data summary.</p>
+  {% endif %}
+</div>
+{% endblock %}

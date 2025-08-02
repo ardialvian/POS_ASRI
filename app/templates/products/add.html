@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3>Tambah Produk</h3>
+  <form method="post">
+    <div class="mb-2">
+      <label>Kode Produk</label>
+      <input type="text" name="code" class="form-control" required>
+    </div>
+    <div class="mb-2">
+      <label>Nama Produk</label>
+      <input type="text" name="name" class="form-control" required>
+    </div>
+    <div class="mb-2">
+      <label>Kategori</label>
+      <input type="text" name="category" class="form-control">
+    </div>
+    <div class="mb-2">
+      <label>Harga Beli</label>
+      <input type="number" name="purchase_price" class="form-control" required>
+    </div>
+    <div class="mb-2">
+      <label>Harga Jual</label>
+      <input type="number" name="price" class="form-control" required>
+    </div>
+    <div class="mb-2">
+      <label>Stock Masuk</label>
+      <input type="number" name="stock_in" class="form-control" required>
+    </div>
+    <div class="md-2">
+      <label>Stock Keluar</label>
+      <input type="number" name="stock_sold" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-success">Simpan</button>
+    <a href="{{ url_for('main.list_products') }}" class="btn btn-secondary">Batal</a>
+  </form>
+</div>
+{% endblock %}

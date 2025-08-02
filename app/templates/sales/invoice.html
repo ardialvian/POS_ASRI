@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<style>
+/* Watermark di tengah halaman */
+.watermark {
+  position: fixed;
+  top: 25%;
+  left: 29%;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+  z-index: 0;
+  width: 400px;
+  pointer-events: none;
+}
+
+/* Layer isi di atas watermark */
+.content-layer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Tambahan untuk kebutuhan print */
+@media print {
+  .sidebar,
+  .navbar,
+  .btn,
+  .no-print,
+  a[href*="/logout"],
+  a[href*="/sales"],
+  .bi-download,
+  .watermark {
+    display: none !important;
+  }
+  /* Jangan sembunyikan watermark */
+  .watermark {
+    display: block !important;
+    position: fixed;
+    top: 17%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.1;
+    z-index: 0;
+    width: 700px;
+    pointer-events: none;
+  }
+
+  body {
+    margin: 50;
+  }
+}
+</style>
+
+<!-- Gambar watermark -->
+<img src="{{ url_for('static', filename='img/asri_logo.png') }}" class="watermark" alt="Watermark">
+
+<div class="container my-4 content-layer" style="max-width:720px">
+
+  <!-- ---------- Header ---------- -->
+  <div class="text-center mb-5">
+    <h3 class="mt-2 mb-0">ASRI GROUP</h3>
+    <ul class="list-unstyled">
+      <li>Jl. Diponegoro RT 009/002 Desa Gantimulyo Kec. Pekalongan</li>
+      <li>Lampung Timur Telp/WA 0878-9586-7879</li>
+    </ul>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Invoice No.{{ sale.id }}</h3>
+  </div>
+
+  <!-- ---------- Info ---------- -->
+  <div class="mb-4">
+    <div><strong>Tanggal&nbsp;:</strong>
+      {{ sale.sale_date.strftime('%d‑%m‑%Y %H:%M') }}</div>
+    <div><strong>Customer:</strong> {{ sale.customer or '–' }}</div>
+  </div>
+
+  <!-- ---------- Item table ---------- -->
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <table class="table mb-0 table-bordered align-middle">
+        <thead class="table-light">
+          <tr class="text-center">
+            <th style="width:90px">Kode</th>
+            <th>Produk</th>
+            <th style="width:60px">Qty</th>
+            <th style="width:120px">Harga</th>
+            <th style="width:120px">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for it in items %}
+          <tr>
+            <td class="text-center">{{ it.code }}</td>
+            <td>{{ it.name }}</td>
+            <td class="text-center">{{ it.quantity }}</td>
+            <td class="text-end">Rp{{ '{:,.0f}'.format(it.sell_price) }}</td>
+            <td class="text-end">Rp{{ '{:,.0f}'.format(it.total) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="table-light">
+            <th colspan="4" class="text-end">Grand Total</th>
+            <th class="text-end">Rp{{ '{:,.0f}'.format(sale.grand_total) }}</th>
+          </tr>
+          <tr>
+            <td colspan="2" rowspan="2">
+              <div style="font-size: 14px;">
+                <strong>Rek. BRI:</strong> 0130-0109-3862-503<br>
+                <strong>Atas Nama:</strong> Hardianti Ning Utari
+              </div>
+            </td>
+            <th colspan="2" class="text-end">Cash</th>
+            <th class="text-end">
+              {% if request.args.get('cash') %}
+                Rp{{ '{:,.0f}'.format(request.args.get('cash')|float) }}
+              {% else %}
+                Rp0
+              {% endif %}
+            </th>
+          </tr>
+          <tr>
+            <th colspan="2" class="text-end">Kembalian</th>
+            <th class="text-end">
+              {% if request.args.get('cash') %}
+              {% set change = request.args.get('cash')|float - sale.grand_total|float %}
+              Rp{{ '{:,.0f}'.format(change) if change >= 0 else '0' }}
+              {% else %}
+              Rp0
+              {% endif %}           
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>    
+  </div>
+  
+  {% endblock %}

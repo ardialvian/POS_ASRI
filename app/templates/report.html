@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  /* Tambahan untuk kebutuhan print */
+@media print {
+  .sidebar,
+  .navbar,
+  .btn,
+  .no-print,
+  a[href*="/logout"],
+  a[href*="/sales"],
+  .bi-download,
+  .watermark {
+    display: none !important;
+  }
+}
+</style>
+<div class="container mt-4">
+  <h3>Ringkasan Transaksi</h3>
+  <a href="{{ url_for('main.export_report') }}" class="btn btn-success mb-3">Download Excel</a>
+  <a href="{{ url_for('main.export_pdf') }}" class="btn btn-danger mb-3 ms-2">Download PDF</a>
+
+  <h5 class="mt-4">📥 Pembelian</h5>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Produk</th><th>Jumlah</th><th>Total Pembelian</th><th>Tanggal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in purchases %}
+      <tr>
+        <td>{{ row[0] }}</td>
+        <td>{{ row[1] }}</td>
+        <td>Rp{{ "{:,.0f}".format(row[2]) }}</td>
+        <td>{{ row[3].strftime('%d-%m-%Y %H:%M') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h5 class="mt-4">📤 Penjualan</h5>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Produk</th><th>Jumlah</th><th>Total Penjualan</th><th>Tanggal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in sales %}
+      <tr>
+        <td>{{ row[0] }}</td>
+        <td>{{ row[1] }}</td>
+        <td>Rp{{ "{:,.0f}".format(row[2]) }}</td>
+        <td>{{ row[3].strftime('%d-%m-%Y %H:%M') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

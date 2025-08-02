@@ -1,0 +1,180 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Transaksi Penjualan</h2>
+
+  <!-- alert flash -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ 'success' if cat=='success' else 'danger' }} alert-dismissible fade show">
+          {{ msg }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form action="{{ url_for('main.add_sale') }}" method="POST" id="sale-form">
+    <!-- ================= customer+cash+total ================= -->
+    <div class="row justify-content-start mt-4 ms-4" style="max-width: 400px;">
+      <div class="mb-2 d-flex align-items-center">
+        <label for="customer" class="me-2" style="min-width: 150px;">Nama Customer:</label>
+        <input type="text" name="customer" class="form-control">
+      </div>
+      <div class="mb-2 d-flex align-items-center">
+        <label for="grand_total" class="me-2" style="min-width: 150px;">Total (Rp):</label>
+        <input type="text" id="total_display" class="form-control bg-light" readonly>
+      </div>
+      <div class="mb-2 d-flex align-items-center">
+        <label for="cash" class="me-2" style="min-width: 150px;">Cash (Rp):</label>
+        <div class="col-8">
+          <div class="input-group">
+            <span class="input-group-text">Rp</span>
+            <input type="number" id="cash" name="cash" class="form-control" required min="0">
+          </div>
+        </div>
+      </div>
+      <div class="mb-2 d-flex align-items-center">
+        <label for="kembalian" class="me-2" style="min-width: 150px;">Kembalian (Rp):</label>
+        <input type="text" id="change_display" class="form-control bg-light" readonly>
+      </div>
+    </div>
+
+
+    <!-- ================= dynamic items ============ -->
+    <h5 class="mt-4">Item Penjualan</h5>
+    <div id="items">
+
+      {# contoh baris item #}
+      <div class="row g-2 align-items-end item">
+        <div class="col-4">
+          <label class="form-label small mb-1">Produk</label>
+          <select class="form-select product-select" name="product_id[]" required>
+            <option value="" hidden>-- pilih produk --</option>
+            {% for p in products %}
+              <option value="{{ p.id }}" data-price="{{ '{:.0f}'.format(p.price) }}">
+                {{ p.name }} — Rp{{ '{:,.0f}'.format(p.price) }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-2">
+          <label class="form-label small mb-1">Qty</label>
+          <input type="number" class="form-control" name="qty[]" min="1" value="1" required>
+        </div>
+
+        <div class="col-3">
+          <label class="form-label small mb-1">Harga Jual (Rp)</label>
+          <input type="number" class="form-control" name="price[]" min="0" placeholder="Harga" required>
+        </div>
+
+        <div class="col-1 d-grid">
+          <button type="button" class="btn btn-outline-danger btn-remove mt-4">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+
+    </div> <!-- /#items -->
+
+    <!-- tombol tambah baris -->
+    <button type="button" id="add-row" class="btn btn-sm btn-secondary mt-3">
+      <i class="bi bi-plus-lg"></i> Item
+    </button>
+
+    <!-- tombol simpan -->
+    <div class="mt-4">
+      <button type="submit" class="btn btn-success">
+        <i class="bi bi-save"></i> Cetak
+      </button>
+      <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Batal</a>
+    </div>
+  </form>
+</div>
+
+<!-- ===== JS dinamis ===== -->
+<script>
+  const tmpl = document.querySelector('#items .item').cloneNode(true);
+
+  function attachPriceListener(row){
+    const select = row.querySelector('.product-select');
+    const priceInput = row.querySelector('input[name="price[]"]');
+
+    select.addEventListener('change', () => {
+      const selected = select.options[select.selectedIndex];
+      const defPrice = selected.dataset.price || '';
+      priceInput.value = defPrice;
+      calculateTotal();  // total ikut berubah kalau harga berubah
+    });
+  }
+
+  function attachTotalListener(row){
+    const qtyInput = row.querySelector('input[name="qty[]"]');
+    const priceInput = row.querySelector('input[name="price[]"]');
+
+    qtyInput.addEventListener('input', calculateTotal);
+    priceInput.addEventListener('input', calculateTotal);
+  }
+
+  function attachRemoveListener(row){
+    const btn = row.querySelector('.btn-remove');
+    btn.addEventListener('click', () => {
+      row.remove();
+      calculateTotal();
+    });
+  }
+  
+  function calculateTotal(){
+    let total = 0;
+    document.querySelectorAll('.item').forEach(row =>{
+      const qty = parseFloat(row.querySelector('input[name="qty[]"]').value) || 0;
+      const price = parseFloat(row.querySelector('input[name="price[]"]').value) || 0;
+      total += qty * price;
+    });
+    document.getElementById("total_display").value = "Rp" + total.toLocaleString("id-ID");
+    calculateChange();
+  }
+  
+  function calculateChange(){
+    const cash = parseFloat(document.getElementById("cash").value) || 0;
+    const totalStr = document.getElementById("total_display").value.replace(/[^\d]/g, '');
+    const total = parseFloat(totalStr) || 0;
+    const change = cash - total;
+    document.getElementById("change_display").value = "Rp" + (change > 0 ? change.toLocaleString("id-ID") : "0");
+    document.getElementById("cash");
+  }
+
+  function addRow(){
+    const clone = tmpl.cloneNode(true);
+    clone.querySelectorAll('input').forEach(i => i.value = (i.name.includes('qty') ? 1 : ''));
+    clone.querySelector('select').selectedIndex = 0;
+    document.getElementById('items').appendChild(clone);
+    attachPriceListener(clone);
+    attachTotalListener(clone);
+    attachRemoveListener(clone);
+    calculateTotal(); // total langsung dihitung setelah baris ditambah
+  }
+
+
+  // pasang ke tombol add
+  document.getElementById('add-row').addEventListener('click', addRow);
+
+  // baris awal
+  attachPriceListener(document.querySelector('#items .item'));
+  attachTotalListener(document.querySelector('#items .item'));
+
+  // hitung total pertama kali
+  document.addEventListener("DOMContentLoaded", calculateTotal);
+
+  //hitung kembalian
+  document.getElementById("cash").addEventListener("input", calculateChange);
+
+  //hapus baris
+  attachRemoveListener(document.querySelector('#items .item'));
+
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+  /* Tambahan untuk kebutuhan print */
+@media print {
+  .sidebar,
+  .navbar,
+  .btn,
+  .no-print,
+  a[href*="/logout"],
+  a[href*="/sales"],
+  .bi-download,
+  .watermark {
+    display: none !important;
+  }}
+</style>
+
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Daftar Produk</h3>
+    <div>
+      <a href="{{ url_for('main.export_product') }}" class="btn btn-success mb-3">Download Excel</a>
+      <a href="{{ url_for('main.add_product') }}" class="btn btn-primary mb-3">Tambah Produk</a>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <table class="table table-bordered table-hover table-striped">
+    <thead class="table-dark text-center">
+      <tr>
+        <th>No</th>
+        <th>Kode</th>
+        <th>Nama</th>
+        <th>Jenis</th>
+        <th>Harga Beli</th>
+        <th>Harga Jual</th>
+        <th>Profit / Item</th>
+        <th>Stock Masuk</th>
+        <th>Terjual</th>
+        <th>Stock Live</th>
+        <th>Value</th>
+        <th>Total Profit</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in products %}
+      <tr class="text-center">
+        <td>{{ loop.index }}</td>
+        <td>{{ p[1] }}</td> <!-- code -->
+        <td>{{ p[2] }}</td> <!-- name -->
+        <td>{{ p[3] }}</td> <!-- category -->
+        <td>Rp{{ "{:,.0f}".format(p[4]) }}</td> <!-- purchase_price -->
+        <td>Rp{{ "{:,.0f}".format(p[5]) }}</td> <!-- sell_price -->
+        <td>Rp{{ "{:,.0f}".format(p[5] - p[4]) }}</td> <!-- profit/item -->
+        <td>{{ p[6] }}</td> <!-- stock_in -->
+        <td>{{ p[7] }}</td> <!-- sold -->
+        <td>{{ p[6] - p[7] }}</td> <!-- stock live -->
+        <td>Rp{{ "{:,.0f}".format((p[6] - p[7]) * p[4]) }}</td> <!-- value -->
+        <td>Rp{{ "{:,.0f}".format(p[7] * (p[5] - p[4])) }}</td> <!-- total profit -->
+        <td>
+          <div class="d-flex justify-content-center gap-2">
+            <a  href="{{ url_for('main.edit_product', id=p[0]) }}"
+                class="btn btn-sm btn-warning"
+                title="Edit">
+                <i class="bi bi-pencil-square"></i>
+            </a>
+            <a  href="{{ url_for('main.delete_product', id=p[0]) }}"
+                class="btn btn-sm btn-danger ms-1"
+                title="Hapus"
+                onclick="return confirm('Yakin ingin menghapus produk ini?')">
+                <i class="bi bi-trash"></i>  
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Daftar Penjualan</h2>
+
+  <a href="{{ url_for('main.sales') }}" class="btn btn-success mb-3">
+    <i class="bi bi-plus-circle"></i> Tambah Penjualan
+  </a>
+
+  <table class="table table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>No</th><th>Produk</th><th>Qty</th>
+        <th>Harga</th><th>Total</th><th>Tanggal</th><th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in sales %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ s[1] }}</td>                       {# nama produk #}
+        <td>{{ s[2] }}</td>                       {# qty #}
+        <td>Rp{{ "{:,.0f}".format(s[3]) }}</td>   {# harga #}
+        <td>Rp{{ "{:,.0f}".format(s[4]) }}</td>   {# total #}
+        <td>{{ s[5].strftime('%d-%m-%Y %H:%M') }}</td>
+        <td class="text-center">
+          <a href="{{ url_for('main.sales_invoice', sale_id=s[0]) }}"
+             class="btn btn-sm btn-outline-primary" title="Invoice">
+            <i class="bi bi-receipt"></i>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

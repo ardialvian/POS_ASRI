@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+    /* Tambahan untuk kebutuhan print */
+  @media print {
+    .sidebar,
+    .navbar,
+    .btn,
+    .no-print,
+    a[href*="/logout"],
+    a[href*="/sales"],
+    .bi-download,
+    .watermark {
+      display: none !important;
+    }}
+</style>
+
+<div class="container mt-4">
+  <h3>Daftar Pembelian</h3>
+  <a href="{{ url_for('main.purchases') }}" class="btn btn-success mb-3">
+    <i class="bi bi-plus-circle"></i> Tambah Pembelian
+  </a>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Produk</th>
+        <th>Jumlah</th>
+        <th>Harga Beli</th>
+        <th>Total</th>
+        <th>Tanggal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in purchases %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ p[1] }}</td>
+        <td>{{ p[2] }}</td>
+        <td>Rp{{ "{:,.0f}".format(p[3]) }}</td>
+        <td>Rp{{ "{:,.0f}".format(p[4]) }}</td>
+        <td>{{ p[5].strftime('%d-%m-%Y %H:%M') if p[5] else '-' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

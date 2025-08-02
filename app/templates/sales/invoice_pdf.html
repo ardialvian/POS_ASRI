@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice #{{ sale.id }}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      position: relative;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      z-index: 1;
+    }
+
+    .header h2 {
+      margin: 10px 0 5px;
+    }
+
+    .header small {
+      font-size: 13px;
+    }
+
+    .info {
+      margin-bottom: 20px;
+      z-index: 1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      z-index: 1;
+    }
+
+    th, td {
+      border: 1px solid #444;
+      padding: 8px 12px;
+      text-align: center;
+    }
+
+    thead {
+      background-color: #f0f0f0;
+    }
+
+    tfoot td {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header toko -->
+  <div class="header">
+    <h3 class="mt-2 mb-0">ASRI GROUP</h3>
+    <ul class="list-unstyled">
+      <p>Jl. Diponegoro RT 009/002 Desa Gantimulyo Kec. Pekalongan</p>
+      <p>Lampung Timur Telp/WA 0878-9586-7879</p>
+    </ul>
+  </div>
+
+  <!-- Info invoice -->
+  <div class="info">
+    <p><strong>Invoice:</strong> #{{ sale.id }}</p>
+    <p><strong>Tanggal:</strong> {{ sale.sale_date.strftime("%d-%m-%Y %H:%M") }}</p>
+    <p><strong>Customer:</strong> {{ sale.customer}}</p>
+  </div>
+
+  <!-- Tabel penjualan -->
+  <table>
+    <thead>
+      <tr>
+        <th>Kode</th>
+        <th>Produk</th>
+        <th>Qty</th>
+        <th>Harga</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for it in items %}
+      <tr>
+        <td>{{ it.code }}</td>
+        <td>{{ it.name }}</td>
+        <td>{{ it.quantity }}</td>
+        <td>Rp{{ "{:,.0f}".format(it.sell_price) }}</td>
+        <td>Rp{{ "{:,.0f}".format(it.total) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4" style="text-align:right;">Grand Total</td>
+        <td>Rp{{ "{:,.0f}".format(grand_total) }}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+</body>
+</html>
